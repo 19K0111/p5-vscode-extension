@@ -274,7 +274,7 @@ function setup() {
     frameRate(0);
 
     window.addEventListener('message', event => {
-        const message = JSON.parse(JSON.stringify(event.data)); // The JSON data our extension sent
+        const message = event.data; // The JSON data our extension sent
         switch (message.command) {
             case "snapshot":
                 // console.log(message);

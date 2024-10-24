@@ -12,6 +12,10 @@ class Ball {
         //     + this.mass * Ball.ACCELERATION() * (STAGE.height - this.location.y);
     }
 
+    static copy(ball) {
+        return new Ball(ball.location.x, ball.location.y, ball.radius, ball.velocity.x, ball.velocity.y, ball.mass, ball.e);
+    }
+
     static ACCELERATION() {
         return 1.0;
     }
@@ -273,20 +277,16 @@ function setup() {
         const message = JSON.parse(JSON.stringify(event.data)); // The JSON data our extension sent
         switch (message.command) {
             case "snapshot":
-                console.log(message);
+                // console.log(message);
 
                 if (message.frameCount !== undefined) {
                     // frameCount = message.frameCount;
                 }
                 if (Object.keys(message.environment).length !== 0) {
-                    console.log(message.environment);
-                    environment = JSON.parse(JSON.stringify(message.environment));
-                    let t = new Array();
+                    environment = message.environment;
                     for (let i = 0; i < message.environment.balls.length; i++) {
-                        t.push(new Ball(message.environment.balls[i].location.x, message.environment.balls[i].location.y, message.environment.balls[i].radius, message.environment.balls[i].velocity.x, message.environment.balls[i].velocity.y, message.environment.balls[i].mass, message.environment.balls[i].e));
+                        environment.balls[i] = Ball.copy(message.environment.balls[i]);
                     }
-                    environment.balls = t;
-                    console.log(environment);
                 }
                 if (message.save_frame_flag !== undefined) {
                     if (message.save_frame_flag !== save_frame.checked()) {
@@ -294,52 +294,14 @@ function setup() {
                     }
                 }
                 if (message.frames.length > 0) {
-                    console.log(message.frames);
-                    frames = [];
-
-                    frames = JSON.parse(JSON.stringify(message.frames));
-                    // console.log("message.frames");
-                    // console.log(message.frames[0].balls[0]);
-                    console.log(frames);
-
+                    frames = message.frames;
                     for (let i = 0; i < message.frames.length; i++) {
-                        let t = new Array();
                         for (let j = 0; j < message.frames[i].balls.length; j++) {
-                            t.push(new Ball(message.frames[i].balls[j].location.x, message.frames[i].balls[j].location.y, message.frames[i].balls[j].radius, message.frames[i].balls[j].velocity.x, message.frames[i].balls[j].velocity.y, message.frames[i].balls[j].mass, message.frames[i].balls[j].e));
-                            // t.velocity.x = message.frames[i].balls[j].x;
-                            // t.velocity.y = message.frames[i].balls[j].y;
-                            // t.radius = message.frames[i].balls[j].r;
-                            // t.velocity.x = message.frames[i].balls[j].vx;
-                            // t.velocity.y = message.frames[i].balls[j].vy;
-                            // t.e = message.frames[i].balls[j].e;
+                            frames[i].balls[j] = Ball.copy(message.frames[i].balls[j]);
                         }
-                        frames[i].balls = t;
                     }
-                    console.log(frames);
-                    // environment = message.frames[message.frames.length - 1];
-                    // environment = JSON.parse(JSON.stringify(message.frames[message.frames.length - 1]));
-                    // for (let i = 0; i < environment.balls.length; i++) {
-                    //     let t = new Ball(environment.balls[i].location.x, environment.balls[i].location.y, environment.balls[i].radius, environment.balls[i].velocity.x, environment.balls[i].velocity.y, environment.balls[i].mass, environment.balls[i].e);
-                    //     environment.balls[i] = t;
-                    // }
-                    // let o1 = Object.entries(environment);
-                    // let o2 = Object.entries(message.frames[message.frames.length - 1]);
-
-
-                    // for (let e1 = 0; e1 < o1.length; e1++) {
-                    //     for (let e2 = 0; e2 < o2.length; e2++) { 
-                    //         if (o1[e1][0] === o2[e2][0]) {
-                    // console.log(`${o2[e2][0]}: ${o2[e2][1]}`);
-                    //             environment[o1[e1][0]] = o2[e2][1];
-                    //         }
-                    //     }
-                    // }
-                    // console.log(message.frames);
-                    // frames = message.frames;
                 }
                 frameRate(FPS);
-                // console.log(frames);
-
                 break;
         }
     });
@@ -375,11 +337,9 @@ function draw() {
             // frames.push(canvas.get());
             let _env = JSON.parse(JSON.stringify(environment));
             // let _env = environment.balls;
-            let t = new Array();
             for (let i = 0; i < _env.balls.length; i++) {
-                t.push(new Ball(_env.balls[i].location.x, _env.balls[i].location.y, _env.balls[i].radius, _env.balls[i].velocity.x, _env.balls[i].velocity.y, _env.balls[i].mass, _env.balls[i].e));
+                _env.balls[i] = Ball.copy(_env.balls[i]);
             }
-            _env.balls = t;
             frames.push(_env);
             // frames.push(environment);
             // image(canvas, -SCREEN_SIZE / 2, -SCREEN_SIZE / 2);

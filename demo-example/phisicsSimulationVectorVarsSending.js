@@ -453,14 +453,32 @@ async function keyPressed() {
 // 指定した時間(ミリ秒)だけ待つ
 const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
-async function waitForMilliseconds(ms) {
-    return waitForFrameCounts(ms / 1000 * frameRate());
-}
+// async function waitForMilliseconds(ms) {
+//     return waitForFrameCounts(ms / 1000 * frameRate());
+// }
 
+let __id__ = 0;
 async function waitForFrameCounts(f) {
-    let start = frameCount;
-    while (frameCount - start < f) { }
-    return;
+    const calledFrameCount = frameCount;
+    const targetFrameCount = frameCount + f;
+
+    let id = ++__id__;
+
+    return new Promise((resolve, reject) => {
+        function checkFrameCount() {
+            if (frameCount >= targetFrameCount) {
+                resolve();
+            } else if (frameCount < calledFrameCount || id !== __id__) {
+                reject("cancelled");
+                return;
+            } else {
+                requestAnimationFrame(checkFrameCount);
+            }
+        }
+        checkFrameCount(); // initial check
+    });
+
+    // return await sleep(f * 1000 / frameRate());
 }
 
 // キーkeyの入力をテストする
@@ -471,9 +489,10 @@ async function keyInputTest(key) {
 }
 
 async function ballsTest(n) {
+    keyInputTest("r");
     for (let i = 0; i < n; i++) {
+        await waitForFrameCounts(FPS);
         keyInputTest("b");
-        waitForFrameCounts(60);
     }
 }
 

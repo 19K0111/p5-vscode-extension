@@ -28,23 +28,26 @@ export function activate(context: vscode.ExtensionContext) {
         // Display a message box to the user
         vscode.window.showInformationMessage('Hello World from helloworld!');
     });
-    vscode.workspace.onDidChangeTextDocument(_editor => {
-        let activeEditor = vscode.window.activeTextEditor;
-        if (!activeEditor) return;
+    vscode.workspace.onDidChangeTextDocument(
+        debounce((event: vscode.TextDocumentChangeEvent) => {
+            let activeEditor = vscode.window.activeTextEditor;
+            if (!activeEditor) return;
 
-        const text = activeEditor.document.getText();
-        console.log("onDidChangeTextDocument");
+            const text = activeEditor.document.getText();
+            console.log("onDidChangeTextDocument");
 
-        if (intervalID != -1) clearInterval(intervalID);
-        intervalID = Number(setTimeout(() => {
-            vscode.window.showInformationMessage("hello world from onDidChange");
-            socket.emit('editor_to_server', text);
-        }, 500));
+            if (intervalID != -1) clearInterval(intervalID);
+            intervalID = Number(setTimeout(() => {
+                vscode.window.showInformationMessage("hello world from onDidChange");
+                socket.emit('editor_to_server', text);
+            }, 500));
 
-        if (ExecutionPanel.currentPanel) {
-            ExecutionPanel.currentPanel.sendHTML(text);
-        }
-    });
+            if (ExecutionPanel.currentPanel) {
+                ExecutionPanel.currentPanel.sendHTML(text);
+            }
+        }, 3000)
+    );
+
 
     context.subscriptions.push(disposable);
 
@@ -87,6 +90,23 @@ function getWebviewOptions(extensionUri: vscode.Uri): vscode.WebviewOptions {
         localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')]
     };
 }
+
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+    let timeout: ReturnType<typeof setTimeout> | null;
+
+    return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+        const context = this;
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+
+        timeout = setTimeout(() => {
+            timeout = null;
+            func.apply(context, args);
+        }, wait);
+    };
+}
+
 
 class ExecutionPanel {
     /**

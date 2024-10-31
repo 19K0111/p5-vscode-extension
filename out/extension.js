@@ -51,7 +51,7 @@ function activate(context) {
         // Display a message box to the user
         vscode.window.showInformationMessage('Hello World from helloworld!');
     });
-    vscode.workspace.onDidChangeTextDocument(_editor => {
+    vscode.workspace.onDidChangeTextDocument(debounce((event) => {
         let activeEditor = vscode.window.activeTextEditor;
         if (!activeEditor)
             return;
@@ -66,7 +66,7 @@ function activate(context) {
         if (ExecutionPanel.currentPanel) {
             ExecutionPanel.currentPanel.sendHTML(text);
         }
-    });
+    }, 3000));
     context.subscriptions.push(disposable);
     context.subscriptions.push(vscode.commands.registerCommand('p5.execute', () => {
         ExecutionPanel.createOrShow(context.extensionUri);
@@ -99,6 +99,19 @@ function getWebviewOptions(extensionUri) {
         enableScripts: true,
         // And restrict the webview to only loading content from our extension's `media` directory.
         localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')]
+    };
+}
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        const context = this;
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(() => {
+            timeout = null;
+            func.apply(context, args);
+        }, wait);
     };
 }
 class ExecutionPanel {

@@ -1,13 +1,16 @@
 {
-  "name": "helloworld",
-  "displayName": "helloworld",
-  "description": "",
+  "name": "p5-live-preview",
+  "displayName": "p5-live-preview",
+  "description": "Allows you to run p5.js code in a live preview, changes are reflected in real-time.",
   "version": "0.0.1",
+  "publisher": "Masaki Saito",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.91.0"
   },
   "categories": [
-    "Other"
+    "Visualization",
+    "Testing"
   ],
   "activationEvents": [
     "*"
@@ -16,23 +19,15 @@
   "contributes": {
     "commands": [
       {
-        "command": "helloworld.helloWorld",
-        "title": "Hello World"
-      },
-      {
-        "command": "helloworld.emitCode",
-        "title": "emit code"
-      },
-      {
-        "command": "p5.execute",
-        "title": "p5: Execute Code"
+        "command": "p5.run",
+        "title": "p5: Run p5.js Code"
       }
     ],
     "menus": {
       "editor/context": [
         {
           "when": "editorFocus",
-          "command": "helloworld.helloWorld",
+          "command": "p5.run",
           "group": "myGroup@1"
         }
       ]
@@ -59,5 +54,9 @@
   },
   "dependencies": {
     "socket.io-client": "^4.7.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/19K0111/p5-vscode-extension.git"
   }
 }

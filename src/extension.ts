@@ -23,11 +23,15 @@ export function activate(context: vscode.ExtensionContext) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json
-    const disposable = vscode.commands.registerCommand('helloworld.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World from helloworld!');
-    });
+
+    // const disposable = vscode.commands.registerCommand('helloworld.helloWorld', () => {
+    //     // The code you place here will be executed every time your command is executed
+    //     // Display a message box to the user
+    //     vscode.window.showInformationMessage('Hello World from helloworld!');
+    // });
+
+    // context.subscriptions.push(disposable);
+
     vscode.workspace.onDidChangeTextDocument(
         debounce((event: vscode.TextDocumentChangeEvent) => {
             let activeEditor = vscode.window.activeTextEditor;
@@ -36,11 +40,11 @@ export function activate(context: vscode.ExtensionContext) {
             const text = activeEditor.document.getText();
             console.log("onDidChangeTextDocument");
 
-            if (intervalID != -1) clearInterval(intervalID);
-            intervalID = Number(setTimeout(() => {
-                vscode.window.showInformationMessage("hello world from onDidChange");
-                socket.emit('editor_to_server', text);
-            }, 500));
+            // if (intervalID != -1) clearInterval(intervalID);
+            // intervalID = Number(setTimeout(() => {
+            //     vscode.window.showInformationMessage("hello world from onDidChange");
+            //     socket.emit('editor_to_server', text);
+            // }, 500));
 
             if (ExecutionPanel.currentPanel) {
                 ExecutionPanel.currentPanel.sendHTML(text);
@@ -48,10 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
         }, 3000)
     );
 
-
-    context.subscriptions.push(disposable);
-
-    context.subscriptions.push(vscode.commands.registerCommand('p5.execute', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('p5.run', () => {
         ExecutionPanel.createOrShow(context.extensionUri);
         ExecutionPanel.currentPanel?.sendHTML(vscode.window.activeTextEditor?.document.getText() || '');
     }));

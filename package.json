@@ -9,11 +9,10 @@
     "vscode": "^1.91.0"
   },
   "categories": [
-    "Visualization",
-    "Testing"
+    "Other"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:JavaScript"
   ],
   "main": "./out/extension.js",
   "contributes": {

@@ -28,7 +28,9 @@ class Ball {
     }
 
     draw() {
+        fill("#8888ff");
         ellipse(this.location.x, this.location.y, this.radius * 2, this.radius * 2);
+        fill("#ffffff");
         if (Ball.vector) {
             this.drawArrow(this.location, this.velocity, color(0, 0, 255));
         }
@@ -199,6 +201,10 @@ function setup() {
             draw_button.html("stop");
             // ff_button.elt.disabled = false;
             slider.elt.disabled = true;
+            while (frames.length > frameCount) {
+                // スナップショットの上書き
+                frames.pop();
+            }
         }
     });
 
@@ -300,6 +306,7 @@ function setup() {
                             frames[i].balls[j] = Ball.copy(message.frames[i].balls[j]);
                         }
                     }
+                    frameCount = frames.length; // スナップショット取得後、続きから実行
                 }
                 frameRate(FPS);
                 break;
@@ -321,7 +328,7 @@ function draw() {
         }
     } else {
         // start
-        if (frameCount <= frames.length) {
+        if (frameCount <= frames.length && false) { // 早送り("&& false" を消す)
             frameRate(FPS);
             drawFrame(frames[frameCount - 1], frameCount);
             // image(frames[frameCount - 1], -SCREEN_SIZE / 2, -SCREEN_SIZE / 2);
@@ -438,7 +445,7 @@ async function keyPressed() {
         // gameOverFlag = false;
     } else if (key == "t") {
         try {
-            await ballsTest(5);
+            await ballsTest(3);
         } catch (e) {
             console.log(e);
         }

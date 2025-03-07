@@ -2,8 +2,8 @@
   "name": "p5-live-preview",
   "displayName": "p5-live-preview",
   "description": "Allows you to run p5.js code in a live preview, changes are reflected in real-time.",
-  "version": "0.0.1",
-  "publisher": "Masaki Saito",
+  "version": "0.0.3",
+  "publisher": "23T0014",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.91.0"
@@ -20,6 +20,18 @@
       {
         "command": "p5.run",
         "title": "p5: Run p5.js Code"
+      },
+      {
+        "command": "p5.reset",
+        "title": "p5: Reset variables which the extension preserves"
+      },
+      {
+        "command": "p5.counter.show",
+        "title": "p5: Show the number of times snapshots have been taken and the event macro has been executed"
+      },
+      {
+        "command": "p5.counter.reset",
+        "title": "p5: Reset the counter of snapshots and the event macro"
       }
     ],
     "menus": {
@@ -30,6 +42,17 @@
           "group": "myGroup@1"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "p5 Live Preview",
+      "properties": {
+        "p5-live-preview.re-executingDelay": {
+          "type": "number",
+          "default": 3000,
+          "description": "The delay time to re-execute the code after the last change."
+        }
+      }
     }
   },
   "scripts": {

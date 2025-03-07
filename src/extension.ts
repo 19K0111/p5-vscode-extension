@@ -3,6 +3,8 @@
 import * as vscode from 'vscode';
 import { io, Socket } from "socket.io-client";
 
+const APP_NAME = "p5-live-preview";
+
 let socket: Socket
 let intervalID: number = -1
 
@@ -12,9 +14,12 @@ let save_frame_flag = true;
 let environment = {};
 let frames: any = [];
 
+let counter = { snapshot: 0, eventmacro: 0 };
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+    let configuration = vscode.workspace.getConfiguration(APP_NAME);
 
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
@@ -33,28 +38,57 @@ export function activate(context: vscode.ExtensionContext) {
     // context.subscriptions.push(disposable);
 
     vscode.workspace.onDidChangeTextDocument(
-        debounce((event: vscode.TextDocumentChangeEvent) => {
+        (event: vscode.TextDocumentChangeEvent) => {
             let activeEditor = vscode.window.activeTextEditor;
             if (!activeEditor) return;
 
             const text = activeEditor.document.getText();
             console.log("onDidChangeTextDocument");
 
-            // if (intervalID != -1) clearInterval(intervalID);
-            // intervalID = Number(setTimeout(() => {
-            //     vscode.window.showInformationMessage("hello world from onDidChange");
-            //     socket.emit('editor_to_server', text);
-            // }, 500));
-
             if (ExecutionPanel.currentPanel) {
-                ExecutionPanel.currentPanel.sendHTML(text);
+                if (intervalID != -1) clearInterval(intervalID);
+                intervalID = Number(setTimeout(() => {
+                    // vscode.window.showInformationMessage("hello world from onDidChange");
+                    // socket.emit('editor_to_server', text);
+                    ExecutionPanel.currentPanel?.sendHTML(text);
+                    vscode.window.showInformationMessage(`re-executingDelay: ${vscode.workspace.getConfiguration(APP_NAME)["re-executingDelay"]}`);
+                }, Number(vscode.workspace.getConfiguration(APP_NAME)["re-executingDelay"])));
             }
-        }, 3000)
+
+        }
     );
 
     context.subscriptions.push(vscode.commands.registerCommand('p5.run', () => {
         ExecutionPanel.createOrShow(context.extensionUri);
         ExecutionPanel.currentPanel?.sendHTML(vscode.window.activeTextEditor?.document.getText() || '');
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('p5.reset', () => {
+        frameCount = 0;
+        save_frame_flag = true;
+        environment = {};
+        frames = [];
+        vscode.window.showInformationMessage(`Reset snapshots.`);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('p5.counter.show', () => {
+        let questionnaireUrl = `https://docs.google.com/forms/d/e/1FAIpQLScmcH1dyPlF06Jh300h8Gm6kr2p25V2CVD4CfUM2_GFjvVsTg/viewform?usp=pp_url&entry.1402000142=${counter.snapshot}&entry.968224659=${counter.eventmacro}`;
+        vscode.window.showInformationMessage(`snapshot: ${counter.snapshot}, eventmacro: ${counter.eventmacro}`, `Answer a questionnaire`).then((value) => {
+            if (value) {
+                vscode.env.openExternal(vscode.Uri.parse(questionnaireUrl));
+            }
+        });
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('p5.counter.reset', () => {
+        const message = vscode.window.showInformationMessage(`Are you sure you want to reset the counter?`, { modal: true }, { title: "Yes", isCloseAffordance: false }, { title: "No", isCloseAffordance: true });
+        message.then((value) => {
+            if (value?.title === "Yes") {
+                counter.snapshot = 0;
+                counter.eventmacro = 0;
+                vscode.window.showInformationMessage(`Reset the counter.`);
+            }
+        });
     }));
 
     if (vscode.window.registerWebviewPanelSerializer) {
@@ -177,13 +211,13 @@ class ExecutionPanel {
             message => {
                 switch (message.command) {
                     case "information":
-                        vscode.window.showInformationMessage(message.text);
+                        vscode.window.showInformationMessage(message.text, { modal: message.modal });
                         return;
                     case "warning":
-                        vscode.window.showWarningMessage(message.text);
+                        vscode.window.showWarningMessage(message.text, { modal: message.modal });
                         return;
                     case 'alert':
-                        vscode.window.showErrorMessage(message.text);
+                        vscode.window.showErrorMessage(message.text, { modal: message.modal });
                         return;
                     case "snapshot":
                         console.log(message);
@@ -191,6 +225,11 @@ class ExecutionPanel {
                         save_frame_flag = (message.save_frame_flag === undefined ? true : message.save_frame_flag);
                         environment = (message.environment === undefined ? undefined : message.environment);
                         frames = (message.frames === undefined ? [] : message.frames);
+                        counter.snapshot += 1;
+                        return;
+                    case "eventmacro":
+                        console.log(message);
+                        counter.eventmacro += 1;
                         return;
                 }
             },

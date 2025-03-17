@@ -497,16 +497,16 @@ async function automaticallyMove() {
         for (let s of sp.getSolution().reverse()) {
             console.log(s);
             if (s.x == 0 && s.y == 1) {
-                await keyInputTest("ArrowUp");
+                await EventMacro.keyInputTest("ArrowUp");
                 console.log("ArrowUp");
             } else if (s.x == -1 && s.y == 0) {
-                await keyInputTest("ArrowRight");
+                await EventMacro.keyInputTest("ArrowRight");
                 console.log("ArrowRight");
             } else if (s.x == 0 && s.y == -1) {
-                await keyInputTest("ArrowDown");
+                await EventMacro.keyInputTest("ArrowDown");
                 console.log("ArrowDown");
             } else if (s.x == 1 && s.y == 0) {
-                await keyInputTest("ArrowLeft");
+                await EventMacro.keyInputTest("ArrowLeft");
                 console.log("ArrowLeft");
             }
         }
@@ -516,30 +516,30 @@ async function automaticallyMove() {
     }
 }
 
-let __id__ = 0;
-async function sleep(ms) {
-    const calledTime = Date.now();
-    const targetTime = calledTime + ms;
+// let __id__ = 0;
+// async function sleep(ms) {
+//     const calledTime = Date.now();
+//     const targetTime = calledTime + ms;
 
-    let id = ++__id__;
+//     let id = ++__id__;
 
-    return new Promise((resolve, reject) => {
-        function checkTime() {
-            if (Date.now() >= targetTime) {
-                resolve();
-            } else if (stop_flag || id !== __id__) {
-                reject("cancelled");
-                return;
-            } else {
-                requestAnimationFrame(checkTime);
-            }
-        }
-        checkTime(); // initial check
-    });
-}
+//     return new Promise((resolve, reject) => {
+//         function checkTime() {
+//             if (Date.now() >= targetTime) {
+//                 resolve();
+//             } else if (stop_flag || id !== __id__) {
+//                 reject("cancelled");
+//                 return;
+//             } else {
+//                 requestAnimationFrame(checkTime);
+//             }
+//         }
+//         checkTime(); // initial check
+//     });
+// }
 
-async function keyInputTest(key) {
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: key }));
-    window.dispatchEvent(new KeyboardEvent('keyup', { key: key }));
-    await sleep(100);
-}
+// async function keyInputTest(key) {
+//     window.dispatchEvent(new KeyboardEvent('keydown', { key: key }));
+//     window.dispatchEvent(new KeyboardEvent('keyup', { key: key }));
+//     await sleep(100);
+// }

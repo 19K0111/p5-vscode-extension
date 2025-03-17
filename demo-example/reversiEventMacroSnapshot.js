@@ -833,36 +833,36 @@ async function keyPressed() {
     }
 }
 
-// 指定した時間(ミリ秒)だけ待つ
-const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
+// // 指定した時間(ミリ秒)だけ待つ
+// const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
-// キーkeyの入力をテストする
-async function keyInputTest(key) {
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: key }));
-    window.dispatchEvent(new KeyboardEvent("keyup", { key: key }));
-    await sleep(100);
-}
+// // キーkeyの入力をテストする
+// async function keyInputTest(key) {
+//     window.dispatchEvent(new KeyboardEvent("keydown", { key: key }));
+//     window.dispatchEvent(new KeyboardEvent("keyup", { key: key }));
+//     await sleep(100);
+// }
 
-// マウスを座標(x, y)に移動するテスト
-async function mouseMoveTest(x, y) {
-    window.dispatchEvent(new MouseEvent("mousemove", { clientX: x, clientY: y }));
-    await sleep(100);
-}
+// // マウスを座標(x, y)に移動するテスト
+// async function mouseMoveTest(x, y) {
+//     window.dispatchEvent(new MouseEvent("mousemove", { clientX: x, clientY: y }));
+//     await sleep(100);
+// }
 
-// 座標(x, y)でマウスクリックするテスト
-async function mouseInputTest(x, y) {
-    window.dispatchEvent(new PointerEvent("click", { clientX: x, clientY: y }));
-    await sleep(100);
-}
+// // 座標(x, y)でマウスクリックするテスト
+// async function mouseInputTest(x, y) {
+//     window.dispatchEvent(new PointerEvent("click", { clientX: x, clientY: y }));
+//     await sleep(100);
+// }
 
 // テスト関数
 async function automaticallyPlaceTest() {
-    await keyInputTest("r");
+    await EventMacro.keyInputTest("r");
     let record = [[2, 3], [3, 2], [5, 4], [4, 5]];
     for (let i = 0; i < record.length; i++) {
         let c = transformBoardLocation(record[i][0], record[i][1]);
-        await mouseMoveTest(c.x, c.y);
-        await mouseInputTest(c.x, c.y);
+        await EventMacro.mouseMoveTest(c.x, c.y);
+        await EventMacro.mouseInputTest(c.x, c.y);
     }
 }
 
@@ -875,31 +875,35 @@ function addressToBoardLocation(str) {
 
 // 黒が勝つときのテスト関数
 async function blackWinTest() {
-    await keyInputTest("r");
+    await EventMacro.keyInputTest("r");
     let record = ["f5", "d6", "c5", "f4", "e3", "f6", "g5", "e6", "e7"];
     for (let i = 0; i < record.length; i++) {
         let c1 = addressToBoardLocation(record[i]);
         let c2 = transformBoardLocation(c1.x, c1.y);
-        await mouseMoveTest(c2.x, c2.y);
-        await mouseInputTest(c2.x, c2.y);
+        while (environment.board.isLegal([c1])) {
+            await EventMacro.mouseMoveTest(c2.x, c2.y);
+            await EventMacro.mouseInputTest(c2.x, c2.y);
+        }
     }
 }
 
 // 白が勝つときのテスト関数
 async function whiteWinTest() {
-    await keyInputTest("r");
+    await EventMacro.keyInputTest("r");
     let record = ["f5", "f6", "c4", "f4", "e6", "b4", "g6", "f7", "e8", "g8", "g5", "h5"];
     for (let i = 0; i < record.length; i++) {
         let c1 = addressToBoardLocation(record[i]);
         let c2 = transformBoardLocation(c1.x, c1.y);
-        await mouseMoveTest(c2.x, c2.y);
-        await mouseInputTest(c2.x, c2.y);
+        while (environment.board.isLegal([c1])) {
+            await EventMacro.mouseMoveTest(c2.x, c2.y);
+            await EventMacro.mouseInputTest(c2.x, c2.y);
+        }
     }
 }
 
 // 引き分けのテスト関数
 async function drawTest() {
-    await keyInputTest("r");
+    await EventMacro.keyInputTest("r");
     let record = ["f5", "d6", "c3", "d3", "c4", "f4", "f6", "f3", "e6", "e7",
         "d7", "c5", "b6", "d8", "c6", "c7", "d2", "b5", "a5", "a6",
         "a7", "g5", "e3", "b4", "c8", "g6", "g4", "c2", "e8", "d1",
@@ -910,8 +914,8 @@ async function drawTest() {
         let c1 = addressToBoardLocation(record[i]);
         let c2 = transformBoardLocation(c1.x, c1.y);
         while (environment.board.isLegal([c1])) {
-            await mouseMoveTest(c2.x, c2.y);
-            await mouseInputTest(c2.x, c2.y);
+            await EventMacro.mouseMoveTest(c2.x, c2.y);
+            await EventMacro.mouseInputTest(c2.x, c2.y);
         }
         // await mouseMoveTest(c2.x, c2.y);
         // await mouseInputTest(c2.x, c2.y);

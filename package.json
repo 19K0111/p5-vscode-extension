@@ -2,7 +2,7 @@
   "name": "p5-live-preview",
   "displayName": "p5-live-preview",
   "description": "Allows you to run p5.js code in a live preview, changes are reflected in real-time.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "23T0014",
   "icon": "icon.png",
   "engines": {

@@ -35,11 +35,25 @@ class EventMacro {
     // 指定した時間(ミリ秒)だけ待つ
     static sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
+    static keyPressing = {};
+
     // キーkeyの入力をテストする
     static async keyInputTest(key) {
         window.dispatchEvent(new KeyboardEvent("keydown", { key: key }));
         window.dispatchEvent(new KeyboardEvent("keyup", { key: key }));
         await EventMacro.sleep(100);
+    }
+
+    // キーkeyを押し続けるテスト
+    static async keyDownTest(key) {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: key }));
+        EventMacro.keyPressing[key] = true;
+    }
+
+    // キーkeyを離すテスト
+    static async keyUpTest(key) {
+        window.dispatchEvent(new KeyboardEvent("keyup", { key: key }));
+        EventMacro.keyPressing[key] = false;
     }
 
     // マウスを座標(x, y)に移動するテスト
